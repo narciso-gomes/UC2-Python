@@ -21,7 +21,11 @@ temperaturas_acima_media = {key: value for key, value in dias_semandas.items() i
 
 print(f"A maior temperatura da semana foi: {maior_temperatura}°C")
 print(f"A menor temperatura da semana foi: {menor_temperatura}°C")
-print(f"A média da temperatura semanal foi: {media_temperatura}°C")
-print("As temperaturas acima da média foram: ")
-for chave, valor in temperaturas_acima_media.items():
-    print(f"{chave}: {valor}°C")
+print(f"A média da temperatura semanal foi: {round(media_temperatura, 2)}°C")
+
+if(len(temperaturas_acima_media.keys()) > 0):
+    print("As temperaturas acima da média foram: ")
+    for chave, valor in temperaturas_acima_media.items():
+        print(f" - {chave}: {valor}°C")
+else:
+    print("A temperatura se manteve a mesma durante toda a semana")
