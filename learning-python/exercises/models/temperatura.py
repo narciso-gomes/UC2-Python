@@ -26,9 +26,10 @@ class Temperatura:
 
     def imprimir_temperaturas(self):
         print("-" * 60)
-        print(f"Temperatura em Celsius: {self.temperatura_celsius()} °C")
-        print(f"Temperatura em Kelvin: {self.temperatura_kelvin()} K")
-        print(f"Temperatura em Fahrenheit: {self.temperatura_fahrenheit()} °F")
+        print("Temperaturas:")
+        print(f"Celsius...: {self.temperatura_celsius():.2f} °C")
+        print(f"Kelvin....: {self.temperatura_kelvin():.2f} K")
+        print(f"Fahrenheit: {self.temperatura_fahrenheit():.2f} °F")
 
     def imprimir_classificacao(self):
         print("-" * 60)
