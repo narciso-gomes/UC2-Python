@@ -47,7 +47,6 @@ def menu():
 
 
 def listar():
-    print()
     print("Lista equipamentos:")
     print("-" * 50)
     for equipamento in equipamentos:
@@ -57,7 +56,24 @@ def listar():
         if not equipamento["disponivel"]:
             print(f"Portador: {equipamento["com"]}")
         print("-" * 50)
-    input("Precione ENTER para voltar para o menu")
+    input("Precione ENTER para voltar para o menu...")
+
+
+def cadastrar():
+    print("Cadastro de novo equipamento")
+    print("-" * 50)
+    codigo_equipamento = input("Código: ")
+    tipo_equipamento = input("Tipo: ")
+    equipamento = {
+        "codigo": codigo_equipamento,
+        "tipo": tipo_equipamento,
+        "disponivel": True,
+        "com": "",
+        "emprestimos": 0,
+    }
+    equipamentos.append(equipamento)
+    print("Equipamento cadastrado com sucesso!")
+    input("Precione ENTER para voltar para o menu...")
 
 
 while True:
@@ -66,6 +82,9 @@ while True:
 
     if acao == 1:
         listar()
+    
+    if acao == 2:
+        cadastrar()
 
     if acao == 0:
         print("Fim do programa!")
