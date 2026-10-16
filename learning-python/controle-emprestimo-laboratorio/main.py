@@ -4,8 +4,8 @@ equipamentos = [
     {
         "codigo": "NB01",
         "tipo": "notebook",
-        "disponivel": True,
-        "com": "",
+        "disponivel": False,
+        "com": "Ana",
         "emprestimos": 4,
     },
     {
@@ -76,15 +76,53 @@ def cadastrar():
     input("Precione ENTER para voltar para o menu...")
 
 
+def emprestar():
+    print("Empréstimo de equipamento")
+    print("-" * 50)
+    nome_responsavel = input("Nome: ")
+
+    equipamentos_pessoa = [
+        equipamento
+        for equipamento in equipamentos
+        if equipamento["com"] == nome_responsavel
+    ]
+    
+    if(len(equipamentos_pessoa) >= 2):
+        print(f"{nome_responsavel} atingiu o limite de empréstimo. (Máximo 02 equipamentos)")
+    else:
+        codigo_equipamento = input("Código: ")
+        
+        encontrou_equipamento = False
+        for equipamento in equipamentos:
+            if equipamento["codigo"] == codigo_equipamento:
+                encontrou_equipamento = True
+                if equipamento["disponivel"]:
+                    equipamento["com"] = nome_responsavel
+                    equipamento["disponivel"] = False
+                    equipamento["emprestimos"] = equipamento["emprestimos"] + 1
+                    print("Equipamento emprestado com sucesso!")
+                else:
+                    print("Equipamento indisponível")
+                break
+
+        if not encontrou_equipamento:
+            print(f"Equipamento com código {codigo_equipamento} não encontrado")
+
+    input("Precione ENTER para voltar para o menu...")
+
+
 while True:
     menu()
     acao = int(input("Escolha uma ação: "))
 
     if acao == 1:
         listar()
-    
+
     if acao == 2:
         cadastrar()
+
+    if acao == 3:
+        emprestar()
 
     if acao == 0:
         print("Fim do programa!")
