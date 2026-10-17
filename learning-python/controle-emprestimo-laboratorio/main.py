@@ -49,13 +49,23 @@ def menu():
 def listar():
     print("Lista equipamentos:")
     print("-" * 50)
+    titulos = ["Código", "Tipo", "Disponível"]
+    print(f"{titulos[0]:<6} | {titulos[1]:<12} | {titulos[2]:<11}")
+    print("-" * 39)
     for equipamento in equipamentos:
-        print(f"Codigo: {equipamento["codigo"]}")
-        print(f"Tipo: {equipamento["tipo"]}")
-        print(f"Disponível: {"Sim" if equipamento["disponivel"] else "Não"}")
-        if not equipamento["disponivel"]:
-            print(f"Portador: {equipamento["com"]}")
-        print("-" * 50)
+        # print(f"Codigo: {equipamento["codigo"]}")
+        # print(f"Tipo: {equipamento["tipo"]}")
+        # print(f"Disponível: {"Sim" if equipamento["disponivel"] else "Não"}")
+        # if not equipamento["disponivel"]:
+        #     print(f"Portador: {equipamento["com"]}")
+        # print("-" * 50)
+
+        # # print(f"{linha[0]:<12} {linha[1]:<8} {linha[2]:<15}")
+        disponivel = "Sim" if equipamento["disponivel"] else "Não"
+        
+        print(
+            f"{equipamento['codigo']:<6} | {equipamento['tipo']:<12} | {disponivel:<11}"
+        )
     input("Precione ENTER para voltar para o menu...")
 
 
@@ -199,7 +209,7 @@ while True:
 
     if acao == 4:
         devolver()
-        
+
     if acao == 5:
         consultar()
 
