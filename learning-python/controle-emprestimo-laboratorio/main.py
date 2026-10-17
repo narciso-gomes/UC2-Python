@@ -52,7 +52,7 @@ def listar():
     for equipamento in equipamentos:
         print(f"Codigo: {equipamento["codigo"]}")
         print(f"Tipo: {equipamento["tipo"]}")
-        print(f"Dispível: {"Sim" if equipamento["disponivel"] else "Não"}")
+        print(f"Disponível: {"Sim" if equipamento["disponivel"] else "Não"}")
         if not equipamento["disponivel"]:
             print(f"Portador: {equipamento["com"]}")
         print("-" * 50)
@@ -86,12 +86,14 @@ def emprestar():
         for equipamento in equipamentos
         if equipamento["com"] == nome_responsavel
     ]
-    
-    if(len(equipamentos_pessoa) >= 2):
-        print(f"{nome_responsavel} atingiu o limite de empréstimo. (Máximo 02 equipamentos)")
+
+    if len(equipamentos_pessoa) >= 2:
+        print(
+            f"{nome_responsavel} atingiu o limite de empréstimo. (Máximo 02 equipamentos)"
+        )
     else:
         codigo_equipamento = input("Código: ")
-        
+
         encontrou_equipamento = False
         for equipamento in equipamentos:
             if equipamento["codigo"] == codigo_equipamento:
@@ -111,6 +113,54 @@ def emprestar():
     input("Precione ENTER para voltar para o menu...")
 
 
+def devolver():
+    print("Devolução de equipamento")
+    print("-" * 50)
+    nome_responsavel = input("Nome: ")
+
+    while True:
+        equipamentos_pessoa = [
+            equipamento
+            for equipamento in equipamentos
+            if equipamento["com"] == nome_responsavel
+        ]
+        
+        if len(equipamentos_pessoa) == 0:
+            print(f"{nome_responsavel} não possui equipamentos emprestados.")
+            break
+
+        print(f"Equipamentos emprestados para {nome_responsavel}:")
+        print("-" * 50)
+        for equipamento in equipamentos_pessoa:
+            print(f"Codigo: {equipamento["codigo"]} Tipo: {equipamento["tipo"]}")
+        codigo_produto_devolucao = input("Código produto: ")
+        equipamento_encontrado = next(
+            (
+                equipamento
+                for equipamento in equipamentos_pessoa
+                if equipamento["codigo"] == codigo_produto_devolucao
+            ),
+            None,
+        )
+        if equipamento_encontrado:
+            equipamento_encontrado["com"] = ""
+            equipamento_encontrado["disponivel"] = True
+            print("Equipamento devolvido com sucesso!")
+
+            if len(equipamentos_pessoa) > 1:
+                proximo_equipamento = input(
+                    "Deseja registra a próxima devolução? (S ou N): "
+                )
+                if proximo_equipamento == "N":
+                    break
+            else:
+                break
+        else:
+            print("Equipamento não encontrado")
+
+    input("Precione ENTER para voltar para o menu...")
+
+
 while True:
     menu()
     acao = int(input("Escolha uma ação: "))
@@ -123,6 +173,9 @@ while True:
 
     if acao == 3:
         emprestar()
+
+    if acao == 4:
+        devolver()
 
     if acao == 0:
         print("Fim do programa!")
