@@ -124,7 +124,7 @@ def devolver():
             for equipamento in equipamentos
             if equipamento["com"] == nome_responsavel
         ]
-        
+
         if len(equipamentos_pessoa) == 0:
             print(f"{nome_responsavel} não possui equipamentos emprestados.")
             break
@@ -161,6 +161,29 @@ def devolver():
     input("Precione ENTER para voltar para o menu...")
 
 
+def consultar():
+    codigo_equipamento = input("Código equipamento: ")
+    equipamento_encontrado = next(
+        (
+            equipamento
+            for equipamento in equipamentos
+            if equipamento["codigo"] == codigo_equipamento
+        ),
+        None,
+    )
+
+    if equipamento_encontrado:
+        print(f"Código: {equipamento_encontrado["codigo"]}")
+        print(f"Tipo: {equipamento_encontrado["tipo"]}")
+        print(f"Disponível: {"Sim" if equipamento_encontrado["disponivel"] else "Não"}")
+        print(f"Responsável: {equipamento_encontrado["com"]}")
+        print(f"Total de empréstimos: {equipamento_encontrado["emprestimos"]}")
+    else:
+        print(f"Equipamento {codigo_equipamento} não encontrado")
+
+    input("Precione ENTER para voltar para o menu...")
+
+
 while True:
     menu()
     acao = int(input("Escolha uma ação: "))
@@ -176,6 +199,9 @@ while True:
 
     if acao == 4:
         devolver()
+        
+    if acao == 5:
+        consultar()
 
     if acao == 0:
         print("Fim do programa!")
