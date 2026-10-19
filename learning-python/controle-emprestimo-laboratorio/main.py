@@ -53,16 +53,8 @@ def listar():
     print(f"{titulos[0]:<6} | {titulos[1]:<12} | {titulos[2]:<11}")
     print("-" * 39)
     for equipamento in equipamentos:
-        # print(f"Codigo: {equipamento["codigo"]}")
-        # print(f"Tipo: {equipamento["tipo"]}")
-        # print(f"Disponível: {"Sim" if equipamento["disponivel"] else "Não"}")
-        # if not equipamento["disponivel"]:
-        #     print(f"Portador: {equipamento["com"]}")
-        # print("-" * 50)
-
-        # # print(f"{linha[0]:<12} {linha[1]:<8} {linha[2]:<15}")
         disponivel = "Sim" if equipamento["disponivel"] else "Não"
-        
+
         print(
             f"{equipamento['codigo']:<6} | {equipamento['tipo']:<12} | {disponivel:<11}"
         )
@@ -194,6 +186,17 @@ def consultar():
     input("Precione ENTER para voltar para o menu...")
 
 
+def remover():
+    global equipamentos
+
+    codigo = input("Código: ")
+    equipamentos = [
+        equipamento for equipamento in equipamentos if equipamento["codigo"] != codigo
+    ]
+    print(f"Equipamento {codigo} removido com sucesso!")
+    input("Precione ENTER para voltar para o menu...")
+
+
 while True:
     menu()
     acao = int(input("Escolha uma ação: "))
@@ -212,6 +215,9 @@ while True:
 
     if acao == 5:
         consultar()
+
+    if acao == 7:
+        remover()
 
     if acao == 0:
         print("Fim do programa!")
