@@ -197,6 +197,55 @@ def remover():
     input("Precione ENTER para voltar para o menu...")
 
 
+def relatorio():
+    total_equipamentos = len(equipamentos)
+    total_equipamentos_disponiveis = 0
+    total_equipamentos_emprestados = 0
+    total_notebook = 0
+    total_tablet = 0
+    total_arduino = 0
+    total_fone = 0
+    equipamento_mais_emprestado = None
+
+    for equipamento in equipamentos:
+        if equipamento["disponivel"]:
+            total_equipamentos_disponiveis += 1
+        else:
+            total_equipamentos_emprestados += 1
+
+        if equipamento["tipo"] == "notebook":
+            total_notebook += 1
+
+        if equipamento["tipo"] == "tablet":
+            total_tablet += 1
+
+        if equipamento["tipo"] == "kit arduino":
+            total_arduino += 1
+
+        if equipamento["tipo"] == "fone":
+            total_fone += 1
+
+        if not equipamento_mais_emprestado:
+            equipamento_mais_emprestado = equipamento
+        else:
+            if equipamento_mais_emprestado["emprestimos"] < equipamento["emprestimos"]:
+                equipamento_mais_emprestado = equipamento
+                
+    print("-" * 50)
+    print("Relatório de Equipamentos")
+    print("-" * 50)
+    print(f"Total de equipamentos............: {total_equipamentos}")
+    print(f"Total de equipamentos disponíveis: {total_equipamentos_disponiveis}")
+    print(f"Total de equipamentos emprestados: {total_equipamentos_emprestados}")
+    print(f"Equipamento mais emprestado......: {equipamento_mais_emprestado['codigo']} - {equipamento_mais_emprestado['tipo']} ({equipamento_mais_emprestado['emprestimos']} empréstimos)")
+    print(f"Total de notebooks...............: {total_notebook}")
+    print(f"Total de tablets.................: {total_tablet}")
+    print(f"Total de arduinos................: {total_arduino}")
+    print(f"Total de fones...................: {total_fone}")
+
+    input("Precione ENTER para voltar para o menu...")
+
+
 while True:
     menu()
     acao = int(input("Escolha uma ação: "))
@@ -215,6 +264,9 @@ while True:
 
     if acao == 5:
         consultar()
+
+    if acao == 6:
+        relatorio()
 
     if acao == 7:
         remover()
