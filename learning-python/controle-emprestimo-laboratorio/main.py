@@ -1,5 +1,9 @@
 TIPOS = ("notebook", "tablet", "kit arduino", "fone")
 
+RED = "\033[31m"
+GREEN = "\033[32m"
+RESET = "\033[0m"
+
 equipamentos = [
     {
         "codigo": "NB01",
@@ -34,16 +38,18 @@ equipamentos = [
 
 
 def menu():
+    print()
+    print("-" * 50)
     print("Menu de Ações:")
     print("-" * 50)
-    print("01. Listar")
-    print("02. Cadastrar")
-    print("03. Emprestar")
-    print("04. Devolver")
-    print("05. Consultar")
-    print("06. Relatório")
-    print("07. Remover")
-    print("0.. Sair")
+    print("📋 1. Listar...: Tabela dos equipamentos")
+    print("➕ 2. Cadastrar: Adicionar novo equipamento")
+    print("📤 3. Emprestar: Registrar empréstimo de equipamento")
+    print("📥 4. Devolver.: Registrar devolução de equipamento")
+    print("🔎 5. Consultar: Consultar detalhes do equipamento por código")
+    print("📊 6. Relatório: Relatório de todos os equipamentos")
+    print("🗑️  7. Remover..: Apagar um registro de equipamento")
+    print("🚪 0. Sair.....: Sair da aplicação")
 
 
 def listar():
@@ -52,8 +58,11 @@ def listar():
     titulos = ["Código", "Tipo", "Disponível"]
     print(f"{titulos[0]:<6} | {titulos[1]:<12} | {titulos[2]:<11}")
     print("-" * 39)
+
     for equipamento in equipamentos:
-        disponivel = "Sim" if equipamento["disponivel"] else "Não"
+        disponivel = (
+            f"{GREEN}Sim{RESET}" if equipamento["disponivel"] else f"{RED}Não{RESET}"
+        )
 
         print(
             f"{equipamento['codigo']:<6} | {equipamento['tipo']:<12} | {disponivel:<11}"
@@ -64,53 +73,68 @@ def listar():
 def cadastrar():
     print("Cadastro de novo equipamento")
     print("-" * 50)
-    codigo_equipamento = input("Código: ")
-    tipo_equipamento = input("Tipo: ")
-    equipamento = {
-        "codigo": codigo_equipamento,
-        "tipo": tipo_equipamento,
-        "disponivel": True,
-        "com": "",
-        "emprestimos": 0,
-    }
-    equipamentos.append(equipamento)
-    print("Equipamento cadastrado com sucesso!")
+    codigo_equipamento = input("Código: ").upper()
+    equipamentos_filtrados = [
+        equipamento
+        for equipamento in equipamentos
+        if equipamento["codigo"] == codigo_equipamento
+    ]
+    if len(equipamentos_filtrados) > 0:
+        print(f"Código {codigo_equipamento} já utilizado.")
+    else:
+        tipo_equipamento = input("Tipo: ")
+
+        if not (tipo_equipamento in TIPOS):
+            print(f"O tipo {tipo_equipamento} não é valido.")
+        else:
+            equipamento = {
+                "codigo": codigo_equipamento,
+                "tipo": tipo_equipamento,
+                "disponivel": True,
+                "com": "",
+                "emprestimos": 0,
+            }
+            equipamentos.append(equipamento)
+            print("Equipamento cadastrado com sucesso!")
+
     input("Precione ENTER para voltar para o menu...")
 
 
 def emprestar():
     print("Empréstimo de equipamento")
     print("-" * 50)
-    nome_responsavel = input("Nome: ")
-
-    equipamentos_pessoa = [
-        equipamento
-        for equipamento in equipamentos
-        if equipamento["com"] == nome_responsavel
-    ]
-
-    if len(equipamentos_pessoa) >= 2:
-        print(
-            f"{nome_responsavel} atingiu o limite de empréstimo. (Máximo 02 equipamentos)"
-        )
+    nome_responsavel = input("Nome: ").strip()
+    if len(nome_responsavel) < 3:
+        print("Nome deve ter no mínimo 3 caracteres")
     else:
-        codigo_equipamento = input("Código: ")
+        equipamentos_pessoa = [
+            equipamento
+            for equipamento in equipamentos
+            if equipamento["com"].lower() == nome_responsavel.lower()
+        ]
 
-        encontrou_equipamento = False
-        for equipamento in equipamentos:
-            if equipamento["codigo"] == codigo_equipamento:
-                encontrou_equipamento = True
-                if equipamento["disponivel"]:
-                    equipamento["com"] = nome_responsavel
-                    equipamento["disponivel"] = False
-                    equipamento["emprestimos"] = equipamento["emprestimos"] + 1
-                    print("Equipamento emprestado com sucesso!")
-                else:
-                    print("Equipamento indisponível")
-                break
+        if len(equipamentos_pessoa) >= 2:
+            print(
+                f"{nome_responsavel} atingiu o limite de empréstimo. (Máximo 02 equipamentos)"
+            )
+        else:
+            codigo_equipamento = input("Código: ")
 
-        if not encontrou_equipamento:
-            print(f"Equipamento com código {codigo_equipamento} não encontrado")
+            encontrou_equipamento = False
+            for equipamento in equipamentos:
+                if equipamento["codigo"] == codigo_equipamento:
+                    encontrou_equipamento = True
+                    if equipamento["disponivel"]:
+                        equipamento["com"] = nome_responsavel
+                        equipamento["disponivel"] = False
+                        equipamento["emprestimos"] = equipamento["emprestimos"] + 1
+                        print("Equipamento emprestado com sucesso!")
+                    else:
+                        print("Equipamento indisponível")
+                    break
+
+            if not encontrou_equipamento:
+                print(f"Equipamento com código {codigo_equipamento} não encontrado")
 
     input("Precione ENTER para voltar para o menu...")
 
@@ -189,11 +213,29 @@ def consultar():
 def remover():
     global equipamentos
 
-    codigo = input("Código: ")
-    equipamentos = [
-        equipamento for equipamento in equipamentos if equipamento["codigo"] != codigo
-    ]
-    print(f"Equipamento {codigo} removido com sucesso!")
+    codigo_equipamento = input("Código equipamento: ")
+    equipamento_encontrado = next(
+        (
+            equipamento
+            for equipamento in equipamentos
+            if equipamento["codigo"] == codigo_equipamento
+        ),
+        None,
+    )
+
+    if equipamento_encontrado:
+        if equipamento_encontrado["disponivel"]:
+            equipamentos = [
+                equipamento
+                for equipamento in equipamentos
+                if equipamento["codigo"] != codigo_equipamento
+            ]
+        else:
+            print("Equipamento está emprestado, não pode ser apagado.")
+    else:
+        print(f"Equipamento {codigo_equipamento} não encontrado")
+
+    print(f"Equipamento {codigo_equipamento} removido com sucesso!")
     input("Precione ENTER para voltar para o menu...")
 
 
@@ -230,14 +272,16 @@ def relatorio():
         else:
             if equipamento_mais_emprestado["emprestimos"] < equipamento["emprestimos"]:
                 equipamento_mais_emprestado = equipamento
-                
+
     print("-" * 50)
     print("Relatório de Equipamentos")
     print("-" * 50)
     print(f"Total de equipamentos............: {total_equipamentos}")
     print(f"Total de equipamentos disponíveis: {total_equipamentos_disponiveis}")
     print(f"Total de equipamentos emprestados: {total_equipamentos_emprestados}")
-    print(f"Equipamento mais emprestado......: {equipamento_mais_emprestado['codigo']} - {equipamento_mais_emprestado['tipo']} ({equipamento_mais_emprestado['emprestimos']} empréstimos)")
+    print(
+        f"Equipamento mais emprestado......: {equipamento_mais_emprestado['codigo']} - {equipamento_mais_emprestado['tipo']} ({equipamento_mais_emprestado['emprestimos']} empréstimos)"
+    )
     print(f"Total de notebooks...............: {total_notebook}")
     print(f"Total de tablets.................: {total_tablet}")
     print(f"Total de arduinos................: {total_arduino}")
@@ -247,30 +291,40 @@ def relatorio():
 
 
 while True:
-    menu()
-    acao = int(input("Escolha uma ação: "))
+    try:
+        menu()
+        acao = int(input("Escolha uma ação: "))
 
-    if acao == 1:
-        listar()
+        if acao > 7:
+            raise ("Opção inválida")
 
-    if acao == 2:
-        cadastrar()
+        if acao == 1:
+            listar()
 
-    if acao == 3:
-        emprestar()
+        if acao == 2:
+            cadastrar()
 
-    if acao == 4:
-        devolver()
+        if acao == 3:
+            emprestar()
 
-    if acao == 5:
-        consultar()
+        if acao == 4:
+            devolver()
 
-    if acao == 6:
-        relatorio()
+        if acao == 5:
+            consultar()
 
-    if acao == 7:
-        remover()
+        if acao == 6:
+            relatorio()
 
-    if acao == 0:
-        print("Fim do programa!")
+        if acao == 7:
+            remover()
+
+        if acao == 0:
+            print("Fim do programa!")
+            break
+
+    except KeyboardInterrupt:
+        print("\nOperação interrompida pelo usuário")
         break
+    except:
+        print("Opção inválida")
