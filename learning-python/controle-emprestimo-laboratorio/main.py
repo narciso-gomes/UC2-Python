@@ -1,41 +1,25 @@
-TIPOS = ("notebook", "tablet", "kit arduino", "fone")
+import json
+import os
 
+ARQUIVO = "C:\\Users\\narciso.4265\\Developer\\UC2-Python\\learning-python\\controle-emprestimo-laboratorio\\equipamentos.json"
+TIPOS = ("notebook", "tablet", "kit arduino", "fone")
 RED = "\033[31m"
 GREEN = "\033[32m"
 RESET = "\033[0m"
 
-equipamentos = [
-    {
-        "codigo": "NB01",
-        "tipo": "notebook",
-        "disponivel": False,
-        "com": "Ana",
-        "emprestimos": 4,
-    },
-    {
-        "codigo": "NB02",
-        "tipo": "notebook",
-        "disponivel": False,
-        "com": "Ana",
-        "emprestimos": 7,
-    },
-    {
-        "codigo": "TB01",
-        "tipo": "tablet",
-        "disponivel": True,
-        "com": "",
-        "emprestimos": 2,
-    },
-    {
-        "codigo": "AR01",
-        "tipo": "kit arduino",
-        "disponivel": False,
-        "com": "Bruno",
-        "emprestimos": 5,
-    },
-    {"codigo": "FN01", "tipo": "fone", "disponivel": True, "com": "", "emprestimos": 0},
-]
 
+def carregar_dados():
+    global equipamentos
+
+    if os.path.exists(ARQUIVO):
+        with open(ARQUIVO, "r", encoding="utf-8") as arquivo:
+            equipamentos = json.load(arquivo)
+
+def salvar_dados():
+    with open(ARQUIVO, "w", encoding="utf-8") as arquivo:
+        json.dump(equipamentos, arquivo, ensure_ascii=False, indent=4)
+
+carregar_dados()
 
 def menu():
     print()
@@ -96,6 +80,7 @@ def cadastrar():
             }
             equipamentos.append(equipamento)
             print("Equipamento cadastrado com sucesso!")
+            salvar_dados()
 
     input("Precione ENTER para voltar para o menu...")
 

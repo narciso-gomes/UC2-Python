@@ -1,0 +1,51 @@
+[
+    {
+        "codigo": "NB01",
+        "tipo": "notebook",
+        "disponivel": false,
+        "com": "Ana",
+        "emprestimos": 4
+    },
+    {
+        "codigo": "NB02",
+        "tipo": "notebook",
+        "disponivel": false,
+        "com": "Ana",
+        "emprestimos": 7
+    },
+    {
+        "codigo": "TB01",
+        "tipo": "tablet",
+        "disponivel": true,
+        "com": "",
+        "emprestimos": 2
+    },
+    {
+        "codigo": "AR01",
+        "tipo": "kit arduino",
+        "disponivel": false,
+        "com": "Bruno",
+        "emprestimos": 5
+    },
+    {
+        "codigo": "FN01",
+        "tipo": "fone",
+        "disponivel": true,
+        "com": "",
+        "emprestimos": 0
+    },
+    {
+        "codigo": "NB012",
+        "tipo": "notebook",
+        "disponivel": true,
+        "com": "",
+        "emprestimos": 0
+    },
+    {
+        "codigo": "NB013",
+        "tipo": "notebook",
+        "disponivel": true,
+        "com": "",
+        "emprestimos": 0
+    }
+]
