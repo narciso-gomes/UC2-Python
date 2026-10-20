@@ -230,12 +230,12 @@ def remover():
                 for equipamento in equipamentos
                 if equipamento["codigo"] != codigo_equipamento
             ]
+            print(f"Equipamento {codigo_equipamento} removido com sucesso!")
         else:
             print("Equipamento está emprestado, não pode ser apagado.")
     else:
         print(f"Equipamento {codigo_equipamento} não encontrado")
 
-    print(f"Equipamento {codigo_equipamento} removido com sucesso!")
     input("Precione ENTER para voltar para o menu...")
 
 
