@@ -1,7 +1,7 @@
 import json
 import os
 
-ARQUIVO = "C:\\Users\\narciso.4265\\Developer\\UC2-Python\\learning-python\\controle-emprestimo-laboratorio\\equipamentos.json"
+ARQUIVO = os.path.join(os.path.dirname(__file__), "equipamentos.json")
 TIPOS = ("notebook", "tablet", "kit arduino", "fone")
 RED = "\033[31m"
 GREEN = "\033[32m"
@@ -10,6 +10,7 @@ RESET = "\033[0m"
 
 def carregar_dados():
     global equipamentos
+    equipamentos = []
 
     if os.path.exists(ARQUIVO):
         with open(ARQUIVO, "r", encoding="utf-8") as arquivo:
@@ -64,23 +65,22 @@ def cadastrar():
         if equipamento["codigo"] == codigo_equipamento
     ]
     if len(equipamentos_filtrados) > 0:
-        print(f"Código {codigo_equipamento} já utilizado.")
-    else:
-        tipo_equipamento = input("Tipo: ")
+        raise ValueError(f"Código {codigo_equipamento} já utilizado.")
 
-        if not (tipo_equipamento in TIPOS):
-            print(f"O tipo {tipo_equipamento} não é valido.")
-        else:
-            equipamento = {
-                "codigo": codigo_equipamento,
-                "tipo": tipo_equipamento,
-                "disponivel": True,
-                "com": "",
-                "emprestimos": 0,
-            }
-            equipamentos.append(equipamento)
-            print("Equipamento cadastrado com sucesso!")
-            salvar_dados()
+    tipo_equipamento = input("Tipo: ")
+    if tipo_equipamento not in TIPOS:
+        raise ValueError(f"O tipo {tipo_equipamento} não é válido.")
+
+    equipamento = {
+        "codigo": codigo_equipamento,
+        "tipo": tipo_equipamento,
+        "disponivel": True,
+        "com": "",
+        "emprestimos": 0,
+    }
+    equipamentos.append(equipamento)
+    print("Equipamento cadastrado com sucesso!")
+    salvar_dados()
 
     input("Precione ENTER para voltar para o menu...")
 
@@ -90,36 +90,37 @@ def emprestar():
     print("-" * 50)
     nome_responsavel = input("Nome: ").strip()
     if len(nome_responsavel) < 3:
-        print("Nome deve ter no mínimo 3 caracteres")
-    else:
-        equipamentos_pessoa = [
+        raise ValueError("Nome deve ter no mínimo 3 caracteres")
+
+    equipamentos_pessoa = [
+        equipamento
+        for equipamento in equipamentos
+        if equipamento["com"].lower() == nome_responsavel.lower()
+    ]
+    if len(equipamentos_pessoa) >= 2:
+        raise ValueError(
+            f"{nome_responsavel} atingiu o limite de empréstimo. (Máximo 02 equipamentos)"
+        )
+
+    codigo_equipamento = input("Código: ").upper()
+    equipamento_encontrado = next(
+        (
             equipamento
             for equipamento in equipamentos
-            if equipamento["com"].lower() == nome_responsavel.lower()
-        ]
+            if equipamento["codigo"] == codigo_equipamento
+        ),
+        None,
+    )
+    if equipamento_encontrado is None:
+        raise ValueError(f"Equipamento com código {codigo_equipamento} não encontrado")
+    if not equipamento_encontrado["disponivel"]:
+        raise ValueError("Equipamento indisponível")
 
-        if len(equipamentos_pessoa) >= 2:
-            print(
-                f"{nome_responsavel} atingiu o limite de empréstimo. (Máximo 02 equipamentos)"
-            )
-        else:
-            codigo_equipamento = input("Código: ")
-
-            encontrou_equipamento = False
-            for equipamento in equipamentos:
-                if equipamento["codigo"] == codigo_equipamento:
-                    encontrou_equipamento = True
-                    if equipamento["disponivel"]:
-                        equipamento["com"] = nome_responsavel
-                        equipamento["disponivel"] = False
-                        equipamento["emprestimos"] = equipamento["emprestimos"] + 1
-                        print("Equipamento emprestado com sucesso!")
-                    else:
-                        print("Equipamento indisponível")
-                    break
-
-            if not encontrou_equipamento:
-                print(f"Equipamento com código {codigo_equipamento} não encontrado")
+    equipamento_encontrado["com"] = nome_responsavel
+    equipamento_encontrado["disponivel"] = False
+    equipamento_encontrado["emprestimos"] += 1
+    print("Equipamento emprestado com sucesso!")
+    salvar_dados()
 
     input("Precione ENTER para voltar para o menu...")
 
@@ -137,13 +138,12 @@ def devolver():
         ]
 
         if len(equipamentos_pessoa) == 0:
-            print(f"{nome_responsavel} não possui equipamentos emprestados.")
-            break
+            raise ValueError(f"{nome_responsavel} não possui equipamentos emprestados.")
 
         print(f"Equipamentos emprestados para {nome_responsavel}:")
         print("-" * 50)
         for equipamento in equipamentos_pessoa:
-            print(f"Codigo: {equipamento["codigo"]} Tipo: {equipamento["tipo"]}")
+            print(f"Codigo: {equipamento['codigo']} Tipo: {equipamento['tipo']}")
         codigo_produto_devolucao = input("Código produto: ")
         equipamento_encontrado = next(
             (
@@ -157,6 +157,7 @@ def devolver():
             equipamento_encontrado["com"] = ""
             equipamento_encontrado["disponivel"] = True
             print("Equipamento devolvido com sucesso!")
+            salvar_dados()
 
             if len(equipamentos_pessoa) > 1:
                 proximo_equipamento = input(
@@ -167,7 +168,7 @@ def devolver():
             else:
                 break
         else:
-            print("Equipamento não encontrado")
+            raise ValueError("Equipamento não encontrado")
 
     input("Precione ENTER para voltar para o menu...")
 
@@ -184,13 +185,13 @@ def consultar():
     )
 
     if equipamento_encontrado:
-        print(f"Código: {equipamento_encontrado["codigo"]}")
-        print(f"Tipo: {equipamento_encontrado["tipo"]}")
-        print(f"Disponível: {"Sim" if equipamento_encontrado["disponivel"] else "Não"}")
-        print(f"Responsável: {equipamento_encontrado["com"]}")
-        print(f"Total de empréstimos: {equipamento_encontrado["emprestimos"]}")
+        print(f"Código: {equipamento_encontrado['codigo']}")
+        print(f"Tipo: {equipamento_encontrado['tipo']}")
+        print(f"Disponível: {'Sim' if equipamento_encontrado['disponivel'] else 'Não'}")
+        print(f"Responsável: {equipamento_encontrado['com']}")
+        print(f"Total de empréstimos: {equipamento_encontrado['emprestimos']}")
     else:
-        print(f"Equipamento {codigo_equipamento} não encontrado")
+        raise ValueError(f"Equipamento {codigo_equipamento} não encontrado")
 
     input("Precione ENTER para voltar para o menu...")
 
@@ -215,11 +216,12 @@ def remover():
                 for equipamento in equipamentos
                 if equipamento["codigo"] != codigo_equipamento
             ]
+            salvar_dados()
             print(f"Equipamento {codigo_equipamento} removido com sucesso!")
         else:
-            print("Equipamento está emprestado, não pode ser apagado.")
+            raise ValueError("Equipamento está emprestado, não pode ser apagado.")
     else:
-        print(f"Equipamento {codigo_equipamento} não encontrado")
+        raise ValueError(f"Equipamento {codigo_equipamento} não encontrado")
 
     input("Precione ENTER para voltar para o menu...")
 
@@ -233,6 +235,9 @@ def relatorio():
     total_arduino = 0
     total_fone = 0
     equipamento_mais_emprestado = None
+
+    if not equipamentos:
+        raise ValueError("Não há equipamentos cadastrados.")
 
     for equipamento in equipamentos:
         if equipamento["disponivel"]:
@@ -280,8 +285,8 @@ while True:
         menu()
         acao = int(input("Escolha uma ação: "))
 
-        if acao > 7:
-            raise ("Opção inválida")
+        if acao not in range(8):
+            raise ValueError("Opção inválida")
 
         if acao == 1:
             listar()
@@ -311,5 +316,5 @@ while True:
     except KeyboardInterrupt:
         print("\nOperação interrompida pelo usuário")
         break
-    except:
-        print("Opção inválida")
+    except ValueError as erro:
+        print(f"Erro: {erro}")
