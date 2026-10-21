@@ -1,4 +1,4 @@
-[
+[        
     {
         "codigo": "NB01",
         "tipo": "notebook",
@@ -37,12 +37,19 @@
     {
         "codigo": "NB012",
         "tipo": "notebook",
-        "disponivel": true,
-        "com": "",
-        "emprestimos": 0
+        "disponivel": false,
+        "com": "Maria",
+        "emprestimos": 2
     },
     {
         "codigo": "NB013",
+        "tipo": "notebook",
+        "disponivel": false,
+        "com": "Narciso",
+        "emprestimos": 1
+    },
+    {
+        "codigo": "NB014",
         "tipo": "notebook",
         "disponivel": true,
         "com": "",

@@ -16,11 +16,14 @@ def carregar_dados():
         with open(ARQUIVO, "r", encoding="utf-8") as arquivo:
             equipamentos = json.load(arquivo)
 
+
 def salvar_dados():
     with open(ARQUIVO, "w", encoding="utf-8") as arquivo:
         json.dump(equipamentos, arquivo, ensure_ascii=False, indent=4)
 
+
 carregar_dados()
+
 
 def menu():
     print()
@@ -38,20 +41,23 @@ def menu():
 
 
 def listar():
-    print("Lista equipamentos:")
-    print("-" * 50)
-    titulos = ["Código", "Tipo", "Disponível"]
-    print(f"{titulos[0]:<6} | {titulos[1]:<12} | {titulos[2]:<11}")
-    print("-" * 39)
+    print()
+    print("LISTA DE EQUIPAMENTOS")
+    print("-" * 55)
+    titulos = ["Código", "Tipo", "Disponível", "Nome"]
+    print(f"{titulos[0]:<6} | {titulos[1]:<12} | {titulos[3]:<15} | {titulos[2]:<11} |")
+    print("-" * 55)
 
     for equipamento in equipamentos:
         disponivel = (
             f"{GREEN}Sim{RESET}" if equipamento["disponivel"] else f"{RED}Não{RESET}"
         )
+        escape = ""
 
         print(
-            f"{equipamento['codigo']:<6} | {equipamento['tipo']:<12} | {disponivel:<11}"
+            f"{equipamento['codigo']:<6} | {equipamento['tipo']:<12} | {equipamento['com']:<15} | {disponivel}{escape:<8} |"
         )
+    print("-" * 55)
     input("Precione ENTER para voltar para o menu...")
 
 
@@ -318,3 +324,4 @@ while True:
         break
     except ValueError as erro:
         print(f"Erro: {erro}")
+        input("Precione ENTER para voltar para o menu...")
