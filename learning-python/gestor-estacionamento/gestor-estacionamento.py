@@ -34,10 +34,13 @@ def vagas_disponiveis():
 
 def menu():
     print("-" * 50)
-    print("Gestor de estacionamento")
+    print(
+        f"Gestor de estacionamento VC={total_vagas_disponiveis_carro} | VM={total_vagas_disponiveis_moto}"
+    )
     print("-" * 50)
     print("01 - Pátio")
     print("02 - Entrada")
+    print("03 - Saída")
 
 
 def lista():
@@ -60,12 +63,45 @@ def entrada():
     elif tipo == 2 and total_vagas_disponiveis_moto <= 0:
         raise ValueError("Não há mais vagas para Motos.")
 
-    placa = input("Placa: ")
+    placa = input("Placa: ").upper().strip()
     hora_entrada = int(input("Hora: (H) "))
 
     veiculo = {"placa": placa, "tipo": TIPOS[tipo - 1], "entrada": hora_entrada}
     patio.append(veiculo)
     print("Veículo adicionado ao pátio com sucesso!")
+
+
+def saida():
+    veiculo = busca_veiculo_placa()
+    hora_saida = int(input("Hora de saída: "))
+
+    if veiculo["placa"] in MENSALISTAS:
+        print("Veículo de mensalistas")
+    else:
+        if veiculo["tipo"] == "carro":
+            total_horas = hora_saida - veiculo["entrada"]
+            valor = PRECO_HORA["carro"] * total_horas
+        elif veiculo["tipo"] == "moto":
+            total_horas = hora_saida - veiculo["entrada"]
+            valor = PRECO_HORA["moto"] * total_horas
+
+        print(f"Valor total (R$): {valor:.2f}")
+
+    patio.pop(veiculo["index"])
+
+
+def busca_veiculo_placa():
+    placa = input("Placa: ").upper().strip()
+    index, veiculo = next(
+        ((i, v) for i, v in enumerate(patio) if v["placa"] == placa),
+        (None, None),
+    )
+
+    if not veiculo:
+        raise ValueError(f"Veículo com placa {placa}, não encontrado")
+
+    veiculo["index"] = index
+    return veiculo
 
 
 while True:
@@ -80,6 +116,9 @@ while True:
 
         if opcao == 2:
             entrada()
+
+        if opcao == 3:
+            saida()
 
         input("Precione ENTER para continuar...")
 
