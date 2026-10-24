@@ -41,6 +41,7 @@ def menu():
     print("01 - Pátio")
     print("02 - Entrada")
     print("03 - Saída")
+    print("04 - Consultar")
 
 
 def lista():
@@ -71,11 +72,19 @@ def entrada():
     print("Veículo adicionado ao pátio com sucesso!")
 
 
+def consultar():
+    veiculo = busca_veiculo_placa()
+    print(f"Placa..........: {veiculo["placa"]}")
+    print(f"Tipo...........: {veiculo["tipo"].capitalize()}")
+    print(f"Hora de entrada: {veiculo["entrada"]}")
+    print(f"Mensalista.....: {'Sim' if veiculo["mensalista"] else 'Não'}")
+
+
 def saida():
     veiculo = busca_veiculo_placa()
     hora_saida = int(input("Hora de saída: "))
 
-    if veiculo["placa"] in MENSALISTAS:
+    if veiculo["mensalista"]:
         print("Veículo de mensalistas")
     else:
         if veiculo["tipo"] == "carro":
@@ -100,7 +109,10 @@ def busca_veiculo_placa():
     if not veiculo:
         raise ValueError(f"Veículo com placa {placa}, não encontrado")
 
+    mensalista = veiculo["placa"] in MENSALISTAS
+    veiculo["mensalista"] = mensalista
     veiculo["index"] = index
+
     return veiculo
 
 
@@ -119,6 +131,9 @@ while True:
 
         if opcao == 3:
             saida()
+        
+        if opcao == 4:
+            consultar()
 
         input("Precione ENTER para continuar...")
 
