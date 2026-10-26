@@ -70,8 +70,14 @@ def entrada():
         raise ValueError("Não há mais vagas para Carros.")
     elif tipo == 2 and total_vagas_disponiveis_moto <= 0:
         raise ValueError("Não há mais vagas para Motos.")
-
+    
+    if not tipo in [1, 2]:
+        raise ValueError("Opção inválida")
+        
     placa = input("Placa: ").upper().strip()
+    
+    if len(placa) != 7:
+        raise ValueError("Placa precisa ter 7 caracteres")
 
     veiculo = next(
         (veiculo for veiculo in patio if veiculo["placa"] == placa),
@@ -81,7 +87,10 @@ def entrada():
     if(veiculo):
         raise ValueError(f"Veículo com a placa {placa} já se encontra no pátio!")
 
-    hora_entrada = int(input("Hora: (H) "))
+    hora_entrada = int(input("Hora de entrada: (0 a 23) "))
+    
+    if not hora_entrada in range(0, 24):
+        raise ValueError("Hora precisa ser um valor inteiro de 0 a 23")
 
     veiculo = {"placa": placa, "tipo": TIPOS[tipo - 1], "entrada": hora_entrada}
     patio.append(veiculo)
@@ -98,7 +107,9 @@ def consultar():
 
 def saida():
     veiculo = busca_veiculo_placa()
-    hora_saida = int(input("Hora de saída: "))
+    hora_saida = int(input("Hora de saída (0 a 23): "))
+    if not hora_saida in range(0, 24):
+        raise ValueError("Hora precisa ser um valor inteiro de 0 a 23")
 
     if hora_saida < veiculo["entrada"]:
         raise ValueError("Hora de saída não pode ser menor que a hora de entrada.")
