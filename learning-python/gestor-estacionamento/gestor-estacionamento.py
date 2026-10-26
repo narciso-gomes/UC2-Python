@@ -72,6 +72,15 @@ def entrada():
         raise ValueError("Não há mais vagas para Motos.")
 
     placa = input("Placa: ").upper().strip()
+
+    veiculo = next(
+        (veiculo for veiculo in patio if veiculo["placa"] == placa),
+        None,
+    )
+    
+    if(veiculo):
+        raise ValueError(f"Veículo com a placa {placa} já se encontra no pátio!")
+
     hora_entrada = int(input("Hora: (H) "))
 
     veiculo = {"placa": placa, "tipo": TIPOS[tipo - 1], "entrada": hora_entrada}
