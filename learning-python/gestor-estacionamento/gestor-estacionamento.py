@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 
 TIPOS = ("carro", "moto")
 VAGAS = {"carro": 5, "moto": 3}
@@ -46,6 +47,8 @@ def menu():
     print("4 - Consultar")
     print("5 - Vagas")
     print("6 - Relatório")
+    print("7 - Cancelar")
+    print("0 - Sair")
 
 
 def lista():
@@ -159,6 +162,29 @@ def relatorio():
     print(f"Maior valor do dia........: R$ {maior_valor:.2f}")
 
 
+def cancelar():
+    veiculo = busca_veiculo_placa()
+    acao = (
+        input(
+            f"Tem certeza que deseja remover o veículo: {veiculo["placa"]} - {veiculo["tipo"]}? (S/N) "
+        )
+        .strip()
+        .upper()
+    )
+    if acao == "S":
+        patio.pop(veiculo["index"])
+        print("Entrada cancelada com sucesso!")
+    else:
+        print("Ação cancelada!")
+
+
+def sair():
+    acao = input("Tem certeza que deseja sair? (S/N) ").strip().upper()
+    if acao == "S":
+        print("Até a próxima!")
+        sys.exit()
+
+
 while True:
     subprocess.run("cls" if os.name == "nt" else "clear", shell=True)
     vagas_disponiveis()
@@ -183,6 +209,12 @@ while True:
 
         if opcao == 6:
             relatorio()
+
+        if opcao == 7:
+            cancelar()
+
+        if opcao == 0:
+            sair()
 
         input("Precione ENTER para continuar...")
 
