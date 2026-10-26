@@ -1,5 +1,17 @@
+
+"""
+-> Usado para pegar o nome do sistema operacional que o script está rodando
+"""
 import os
+
+"""
+-> Usado para rodar o comando clear/cls no terminal
+"""
 import subprocess
+
+"""
+-> Usado para encerrar o script quando usuário escolher opção Sair
+"""
 import sys
 
 TIPOS = ("carro", "moto")
@@ -12,12 +24,14 @@ patio = [
     {"placa": "MOT0R99", "tipo": "moto", "entrada": 9},
     {"placa": "ZXC7V89", "tipo": "carro", "entrada": 10},
     {"placa": "ABC1D23", "tipo": "carro", "entrada": 11},
-    {"placa": "NMI9999", "tipo": "moto", "entrada": 12},
+    {"placa": "NMI9999", "tipo": "moto", "entrada": 23},
 ]
 
 saidas = []
 
-
+"""
+Itera todos os veiculos do patio, calcula as vagas diponíveis por tipo e disponibiliza com variáveis globais
+"""
 def vagas_disponiveis():
     global total_vagas_disponiveis_carro
     global total_vagas_disponiveis_moto
@@ -34,7 +48,9 @@ def vagas_disponiveis():
     total_vagas_disponiveis_carro = VAGAS["carro"] - total_vagas_carro
     total_vagas_disponiveis_moto = VAGAS["moto"] - total_vagas_moto
 
-
+"""
+Imprime menu no terminal
+"""
 def menu():
     print("-" * 50)
     print(
@@ -50,7 +66,9 @@ def menu():
     print("7 - Cancelar")
     print("0 - Sair")
 
-
+"""
+Exibe uma lista de todos os veículos que estão no pátio
+"""
 def lista():
     titulos = ["Placa", "Tipo", "Entrada"]
     print("-" * 30)
@@ -62,7 +80,10 @@ def lista():
         )
     print("-" * 30)
 
-
+"""
+Processa o registro de entrada de veículos no pátio
+Valida por tipo e placa, verifica se placa informada ja está no pátio
+"""
 def entrada():
     tipo = int(input("Tipo: (1 - Carro | 2 - Moto) "))
 
@@ -96,7 +117,9 @@ def entrada():
     patio.append(veiculo)
     print("Veículo adicionado ao pátio com sucesso!")
 
-
+"""
+Consulta veículo específico no pátio pela placa
+"""
 def consultar():
     veiculo = busca_veiculo_placa()
     print(f"Placa..........: {veiculo["placa"]}")
@@ -104,7 +127,9 @@ def consultar():
     print(f"Hora de entrada: {veiculo["entrada"]}")
     print(f"Mensalista.....: {'Sim' if veiculo["mensalista"] else 'Não'}")
 
-
+"""
+Remove veículo do pátio e calcula valor a ser pago e valida hora de saída
+"""
 def saida():
     veiculo = busca_veiculo_placa()
     hora_saida = int(input("Hora de saída (0 a 23): "))
@@ -134,7 +159,10 @@ def saida():
     veiculo["saida"] = hora_saida
     saidas.append(veiculo)
 
-
+"""
+Busca veículo por placa
+Função reutiliza nos métodos: cancelar, consultar e saida
+"""
 def busca_veiculo_placa():
     placa = input("Placa: ").upper().strip()
     index, veiculo = next(
@@ -151,12 +179,16 @@ def busca_veiculo_placa():
 
     return veiculo
 
-
+"""
+Exibe quantas vagas tem disponíveis por tipo de veículos
+"""
 def vagas():
     print("Vagas de carros: ", total_vagas_disponiveis_carro)
     print("Vagas de motos.: ", total_vagas_disponiveis_moto)
 
-
+"""
+Exibe relatório de vagas
+"""
 def relatorio():
     total_veiculos_patio = len(patio)
     total_veiculos_saida = len(saidas)
@@ -182,6 +214,9 @@ def relatorio():
     print(f"Maior valor do dia........: R$ {maior_valor:.2f}")
 
 
+"""
+Cancela entrada de veículo no pátio
+"""
 def cancelar():
     veiculo = busca_veiculo_placa()
     acao = (
@@ -197,13 +232,14 @@ def cancelar():
     else:
         print("Ação cancelada!")
 
-
+"""
+Sai do sistema
+"""
 def sair():
     acao = input("Tem certeza que deseja sair? (S/N) ").strip().upper()
     if acao == "S":
         print("Até a próxima!")
         sys.exit()
-
 
 while True:
     subprocess.run("cls" if os.name == "nt" else "clear", shell=True)
