@@ -10,6 +10,8 @@ patio = [
     {"placa": "QWE4R56", "tipo": "carro", "entrada": 8},
     {"placa": "MOT0R99", "tipo": "moto", "entrada": 9},
     {"placa": "ZXC7V89", "tipo": "carro", "entrada": 10},
+    {"placa": "ABC1D23", "tipo": "carro", "entrada": 11},
+    {"placa": "NMI9999", "tipo": "moto", "entrada": 12}
 ]
 
 saidas = []
@@ -38,10 +40,12 @@ def menu():
         f"Gestor de estacionamento VC={total_vagas_disponiveis_carro} | VM={total_vagas_disponiveis_moto}"
     )
     print("-" * 50)
-    print("01 - Pátio")
-    print("02 - Entrada")
-    print("03 - Saída")
-    print("04 - Consultar")
+    print("1 - Pátio")
+    print("2 - Entrada")
+    print("3 - Saída")
+    print("4 - Consultar")
+    print("5 - Vagas")
+    print("6 - Relatório")
 
 
 def lista():
@@ -85,7 +89,7 @@ def saida():
     hora_saida = int(input("Hora de saída: "))
 
     if veiculo["mensalista"]:
-        print("Veículo de mensalistas")
+        valor = 0
     else:
         if veiculo["tipo"] == "carro":
             total_horas = hora_saida - veiculo["entrada"]
@@ -97,6 +101,9 @@ def saida():
         print(f"Valor total (R$): {valor:.2f}")
 
     patio.pop(veiculo["index"])
+    veiculo["valor"] = valor
+    veiculo["saida"] = hora_saida
+    saidas.append(veiculo)
 
 
 def busca_veiculo_placa():
@@ -116,6 +123,36 @@ def busca_veiculo_placa():
     return veiculo
 
 
+def vagas():
+    print("Vagas de carros: ", total_vagas_disponiveis_carro)
+    print("Vagas de motos.: ", total_vagas_disponiveis_moto)
+
+
+def relatorio():
+    total_veiculos_patio = len(patio)
+    total_veiculos_saida = len(saidas)
+    total_faturamento = 0
+    total_mensalistas = 0
+    maior_valor = 0
+
+    for veiculo_saida in saidas:
+        total_faturamento += veiculo_saida["valor"]
+        if veiculo_saida["mensalista"]:
+            total_mensalistas += 1
+
+        if maior_valor < veiculo_saida["valor"]:
+            maior_valor = veiculo_saida["valor"]
+
+    print("-" * 30)
+    print("Relatório de Movimentações")
+    print("-" * 30)
+    print(f"Total de veículos no pátio: {total_veiculos_patio}")
+    print(f"Total de saídas...........: {total_veiculos_saida}")
+    print(f"Saídas de mensalistas.....: {total_mensalistas}")
+    print(f"Faturamento do dia........: R$ {total_faturamento:.2f}")
+    print(f"Maior valor do dia........: R$ {maior_valor:.2f}")
+
+
 while True:
     subprocess.run("cls" if os.name == "nt" else "clear", shell=True)
     vagas_disponiveis()
@@ -131,9 +168,15 @@ while True:
 
         if opcao == 3:
             saida()
-        
+
         if opcao == 4:
             consultar()
+
+        if opcao == 5:
+            vagas()
+
+        if opcao == 6:
+            relatorio()
 
         input("Precione ENTER para continuar...")
 
