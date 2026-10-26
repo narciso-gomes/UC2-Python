@@ -11,7 +11,7 @@ patio = [
     {"placa": "MOT0R99", "tipo": "moto", "entrada": 9},
     {"placa": "ZXC7V89", "tipo": "carro", "entrada": 10},
     {"placa": "ABC1D23", "tipo": "carro", "entrada": 11},
-    {"placa": "NMI9999", "tipo": "moto", "entrada": 12}
+    {"placa": "NMI9999", "tipo": "moto", "entrada": 12},
 ]
 
 saidas = []
@@ -88,14 +88,20 @@ def saida():
     veiculo = busca_veiculo_placa()
     hora_saida = int(input("Hora de saída: "))
 
+    if hora_saida < veiculo["entrada"]:
+        raise ValueError("Hora de saída não pode ser menor que a hora de entrada.")
+
     if veiculo["mensalista"]:
         valor = 0
     else:
+        total_horas = hora_saida - veiculo["entrada"]
+
+        if total_horas == 0:
+            total_horas += 1
+
         if veiculo["tipo"] == "carro":
-            total_horas = hora_saida - veiculo["entrada"]
             valor = PRECO_HORA["carro"] * total_horas
         elif veiculo["tipo"] == "moto":
-            total_horas = hora_saida - veiculo["entrada"]
             valor = PRECO_HORA["moto"] * total_horas
 
         print(f"Valor total (R$): {valor:.2f}")
