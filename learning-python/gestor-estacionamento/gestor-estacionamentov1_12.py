@@ -1,0 +1,282 @@
+#Gestor de estacionamento v1.12
+#Narciso e Glaucio
+
+import datetime #usado para calcular tempo com hora do sistema
+import math #usado para performar arredondamento de valores
+
+"""
+-> Usado para pegar o nome do sistema operacional que o script está rodando
+"""
+import os
+
+"""
+-> Usado para rodar o comando clear/cls no terminal
+"""
+import subprocess
+
+"""
+-> Usado para encerrar o script quando usuário escolher opção Sair
+"""
+import sys
+
+TIPOS = ("carro", "moto")
+VAGAS = {"carro": 5, "moto": 3}
+PRECO_HORA = {"carro": 6.00, "moto": 3.50}
+MENSALISTAS = ("ABC1D23", "MOT0R99")
+
+patio = [
+    {"placa": "QWE4R56", "tipo": "carro", "entrada": datetime.datetime(2026, 10, 26, 9, 10, 00)},
+    {"placa": "MOT0R99", "tipo": "moto", "entrada": datetime.datetime(2026, 10, 26, 8, 15, 51)},
+    {"placa": "ZXC7V89", "tipo": "carro", "entrada": datetime.datetime(2026, 10, 26, 11, 20, 51)},
+    {"placa": "ABC1D23", "tipo": "carro", "entrada": datetime.datetime(2026, 10, 26, 20, 10, 51)},
+    {"placa": "NMI9999", "tipo": "moto", "entrada": datetime.datetime(2026, 10, 26, 00, 18, 51)},
+    
+]
+
+saidas = []
+
+"""
+Itera todos os veiculos do patio, calcula as vagas diponíveis por tipo e disponibiliza com variáveis globais
+"""
+def vagas_disponiveis():
+    global total_vagas_disponiveis_carro
+    global total_vagas_disponiveis_moto
+
+    total_vagas_carro = 0
+    total_vagas_moto = 0
+
+    for veiculo in patio:
+        if veiculo["tipo"] == "carro":
+            total_vagas_carro += 1
+        elif veiculo["tipo"] == "moto":
+            total_vagas_moto += 1
+
+    total_vagas_disponiveis_carro = VAGAS["carro"] - total_vagas_carro
+    total_vagas_disponiveis_moto = VAGAS["moto"] - total_vagas_moto
+
+"""
+Imprime menu no terminal
+"""
+def menu():
+    hora_atual = datetime.datetime.now().replace(microsecond=0) #mostra hora no momento que volta ao menu, removendo os microsegundos para ficar mais limpo
+    print("-" * 50)
+    print(
+        f"Gestor de estacionamento VC={total_vagas_disponiveis_carro} | VM={total_vagas_disponiveis_moto}" #no menu sempre mostra quantas vagas tem disponíveis por tipo de veículo
+    )
+    print("-" * 50)
+    print(f"Hora atual: {hora_atual}")
+    print("-" * 50)
+    print("1 - Pátio")
+    print("2 - Entrada")
+    print("3 - Saída")
+    print("4 - Consultar")
+    print("5 - Vagas")
+    print("6 - Relatório")
+    print("7 - Cancelar")
+    print("0 - Sair")
+    
+
+"""
+Exibe uma lista de todos os veículos que estão no pátio
+"""
+def lista():
+    titulos = ["Placa", "Tipo", "Entrada"]
+    print("-" * 30)
+    print(f"| {titulos[0]:<7} | {titulos[1]:<6} | {titulos[2]:<7} |")
+    print("-" * 30)
+    for veiculo in patio:
+        print(
+            f"| {veiculo['placa']:<7} | {veiculo['tipo']:<6} | {veiculo['entrada']} |"
+        )
+    print("-" * 30)    
+
+"""
+Processa o registro de entrada de veículos no pátio
+Valida por tipo e placa, verifica se placa informada ja está no pátio
+"""
+def entrada():
+    tipo = int(input("Tipo: (1 - Carro | 2 - Moto) "))
+
+    if tipo == 1 and total_vagas_disponiveis_carro <= 0:
+        raise ValueError("Não há mais vagas para Carros.")
+    elif tipo == 2 and total_vagas_disponiveis_moto <= 0:
+        raise ValueError("Não há mais vagas para Motos.")
+    
+    if not tipo in [1, 2]:
+        raise ValueError("Opção inválida")
+        
+    placa = input("Placa: ").upper().strip()
+    
+    if len(placa) != 7:
+        raise ValueError("Placa precisa ter 7 caracteres")
+
+    veiculo = next(
+        (veiculo for veiculo in patio if veiculo["placa"] == placa),
+        None,
+    )
+    
+    if(veiculo):
+        raise ValueError(f"Veículo com a placa {placa} já se encontra no pátio!")
+    
+    hora_entrada = datetime.datetime.now().replace(microsecond=0)
+  
+    veiculo = {"placa": placa, "tipo": TIPOS[tipo - 1], "entrada": hora_entrada}
+    patio.append(veiculo)
+    print("Veículo adicionado ao pátio com sucesso!")
+    print(f"Placa: {placa} | Tipo: {TIPOS[tipo - 1]} | Entrada: {hora_entrada}")
+
+"""
+Consulta veículo específico no pátio pela placa
+"""
+def consultar():
+    veiculo = busca_veiculo_placa()
+    print(f"Placa..........: {veiculo["placa"]}")
+    print(f"Tipo...........: {veiculo["tipo"].capitalize()}")
+    print(f"Hora de entrada: {veiculo["entrada"]}")
+    print(f"Mensalista.....: {'Sim' if veiculo["mensalista"] else 'Não'}")
+
+"""
+Remove veículo do pátio e calcula valor a ser pago e valida hora de saída
+"""
+def saida():
+    veiculo = busca_veiculo_placa()
+    hora_saida = datetime.datetime.now().replace(microsecond=0)
+    
+    if veiculo["mensalista"]:
+        valor = 0
+    else:
+        total_horas = hora_saida - veiculo["entrada"]
+        total_horas = total_horas.total_seconds() / 3600
+        total_horas = math.ceil(total_horas) #arredonda para cima, pois se o cliente ficar 1h e 1min, ele pagará 2h
+        
+        if veiculo["tipo"] == "carro":
+            valor = PRECO_HORA["carro"] * total_horas
+        elif veiculo["tipo"] == "moto":
+            valor = PRECO_HORA["moto"] * total_horas
+
+        print(f"Valor total (R$): {valor:.2f}")
+        print("Saida Registrada")
+
+    patio.pop(veiculo["index"])
+    veiculo["valor"] = valor
+    veiculo["saida"] = hora_saida
+    saidas.append(veiculo)
+
+"""
+Busca veículo por placa
+Função reutiliza nos métodos: cancelar, consultar e saida
+"""
+def busca_veiculo_placa():
+    placa = input("Placa: ").upper().strip()
+    index, veiculo = next(
+        ((i, v) for i, v in enumerate(patio) if v["placa"] == placa),
+        (None, None),
+    )
+
+    if not veiculo:
+        raise ValueError(f"Veículo com placa {placa}, não encontrado")
+
+    mensalista = veiculo["placa"] in MENSALISTAS
+    veiculo["mensalista"] = mensalista
+    veiculo["index"] = index
+
+    return veiculo
+
+"""
+Exibe quantas vagas tem disponíveis por tipo de veículos
+"""
+def vagas():
+    print("Vagas de carros: ", total_vagas_disponiveis_carro)
+    print("Vagas de motos.: ", total_vagas_disponiveis_moto)
+
+"""
+Exibe relatório de vagas
+"""
+def relatorio():
+    total_veiculos_patio = len(patio)
+    total_veiculos_saida = len(saidas)
+    total_faturamento = 0
+    total_mensalistas = 0
+    maior_valor = 0
+
+    for veiculo_saida in saidas:
+        total_faturamento += veiculo_saida["valor"]
+        if veiculo_saida["mensalista"]:
+            total_mensalistas += 1
+
+        if maior_valor < veiculo_saida["valor"]:
+            maior_valor = veiculo_saida["valor"]
+
+    print("-" * 30)
+    print("Relatório de Movimentações")
+    print("-" * 30)
+    print(f"Total de veículos no pátio: {total_veiculos_patio}")
+    print(f"Total de saídas...........: {total_veiculos_saida}")
+    print(f"Saídas de mensalistas.....: {total_mensalistas}")
+    print(f"Faturamento do dia........: R$ {total_faturamento:.2f}")
+    print(f"Maior valor do dia........: R$ {maior_valor:.2f}")
+
+
+"""
+Cancela entrada de veículo no pátio
+"""
+def cancelar():
+    veiculo = busca_veiculo_placa()
+    acao = (
+        input(
+            f"Tem certeza que deseja remover o veículo: {veiculo["placa"]} - {veiculo["tipo"]}? (S/N) "
+        )
+        .strip()
+        .upper()
+    )
+    if acao == "S":
+        patio.pop(veiculo["index"])
+        print("Entrada cancelada com sucesso!")
+    else:
+        print("Ação cancelada!")
+
+"""
+Sai do sistema
+"""
+def sair():
+    acao = input("Tem certeza que deseja sair? (S/N) ").strip().upper()
+    if acao == "S":
+        print("Até a próxima!")
+        sys.exit()
+
+while True:
+    subprocess.run("cls" if os.name == "nt" else "clear", shell=True)
+    vagas_disponiveis()
+    try:
+        menu()
+        opcao = int(input("Opção: "))
+
+        if opcao == 1:
+            lista()
+
+        if opcao == 2:
+            entrada()
+
+        if opcao == 3:
+            saida()
+
+        if opcao == 4:
+            consultar()
+
+        if opcao == 5:
+            vagas()
+
+        if opcao == 6:
+            relatorio()
+
+        if opcao == 7:
+            cancelar()
+
+        if opcao == 0:
+            sair()
+
+        input("Precione ENTER para continuar...")
+
+    except ValueError as erro:
+        print(f"Erro: {erro}")
+        input("Precione ENTER para voltar para o menu...")
